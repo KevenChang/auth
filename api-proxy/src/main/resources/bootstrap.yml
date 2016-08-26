@@ -3,4 +3,5 @@ spring:
     name: api-proxy
   cloud:
     zookeeper:
-      connectString: localhost:2181
+      connectString: 10.158.221.9:2181
+

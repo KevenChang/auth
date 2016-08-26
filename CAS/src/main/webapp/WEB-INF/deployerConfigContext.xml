@@ -109,13 +109,13 @@
             <value>com.mysql.jdbc.Driver</value>
         </property>
         <property name="url">
-            <value>jdbc:mysql://iplus.mysql.rdstest.tbsite.net:3306/given?useUnicode=true&amp;characterEncoding=utf-8</value>
+            <value>jdbc:mysql://mySqlServer:3306/sso?useUnicode=true&amp;characterEncoding=utf-8</value>
         </property>
         <property name="username">
-            <value>firstcloud</value>
+            <value>root</value>
         </property>
         <property name="password">
-            <value>firstcloud</value>
+            <value>123456</value>
         </property>
     </bean>
 </beans>

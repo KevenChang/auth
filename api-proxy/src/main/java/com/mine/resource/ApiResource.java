@@ -7,6 +7,7 @@ import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.core.env.Environment;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Path("/")
@@ -39,13 +41,12 @@ public class ApiResource {
     private static final GrantedAuthority ROLE_B = new SimpleGrantedAuthority("ROLE_B");
     @Context
     private HttpServletRequest httpRequest;
-
+    @Context
+    private Environment env;
     @Autowired
     private DiscoveryClient discovery;
 
-
-    static int appARestUsersCount = 0;
-    static int appBRestUsersCount = 0;
+    private AtomicInteger counter = new AtomicInteger();
 
     @GET
     @Path("health")
@@ -76,10 +77,9 @@ public class ApiResource {
         List<ServiceInstance> appBInstances = getAppInstaces("app-b");
 
         /*轮询访问app */
-        int indexA = appARestUsersCount % appAInstances.size();
-        appARestUsersCount++;
-        int indexB = appBRestUsersCount % appBInstances.size();
-        appBRestUsersCount++;
+        int i = Math.abs(counter.incrementAndGet());
+        int indexA = i % appAInstances.size();
+        int indexB = i % appBInstances.size();
 
         /*请求处理*/
         List<AppUser> appAUserList = null;
@@ -92,6 +92,14 @@ public class ApiResource {
             URI appBUri = appBInstances.get(indexB).getUri();
             appBUserList = getAppUsers(appBUri);
         }
+
+        /*跨业务域请求处理*/
+        try {
+            URI remoteAppAInstanceUri = URI.create(env.getProperty("app-a"));
+            appAUserList.addAll(getAppUsers(remoteAppAInstanceUri));
+        } catch (Exception ignored) {
+        }
+
         /*数据处理*/
         List<AppUser> retList = getListByRule(allow, deny, appAUserList);
         if ((retList != null) && (!retList.isEmpty())) {
@@ -112,12 +120,12 @@ public class ApiResource {
             return null;
         }
 
-        if(allow != null){
+        if (allow != null) {
             if (allow.contains("ALL")) {
                 retList.addAll(appList);
             } else {
                 String[] allowList = {allow};
-                if(allow.contains(",")){
+                if (allow.contains(",")) {
                     allowList = allow.split(",");
                 }
                 for (int i = 0; i < appList.size(); i++) {
