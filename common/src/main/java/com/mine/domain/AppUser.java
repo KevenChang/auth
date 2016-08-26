@@ -1,7 +1,9 @@
 package com.mine.domain;
 
 import java.util.List;
-
+/**
+ * Õ®”√¿‡
+ */
 public class AppUser {
     private int id;
     private String name;

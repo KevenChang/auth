@@ -6,6 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
+/**
+ * Spring boot入口
+ */
+
 @SpringBootApplication
 @EnableDiscoveryClient
 public class MyApplication {

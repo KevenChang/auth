@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 从assertion中获取CAS带过来的属性
+ *
+ */
+
 public class CasUserDetailsService implements AuthenticationUserDetailsService {
     private static final Logger logger = LogManager.getLogger(CasUserDetailsService.class);
 
